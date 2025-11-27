@@ -1,4 +1,5 @@
 import pygame
+import random
 
 LARGURA = 600 
 ALTURA = 720
@@ -15,6 +16,17 @@ class Entidade(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += dy
 
+
+# TIRO (DO JOGADOR)
+class Tiro(Entidade):
+    def __init__(self, x, y):
+        super().__init__(x, y, 10)
+        self.image.fill((255, 255, 0))  # amarelo
+
+    def update(self):
+        self.rect.y -= self.velocidade
+        if self.rect.y < 0:
+            self.kill()
 
 # JOGADOR
 class Jogador(Entidade):
@@ -39,18 +51,9 @@ class Jogador(Entidade):
         self.rect.x = max(0, min(self.rect.x, LARGURA - 40))
         self.rect.y = max(0, min(self.rect.y, ALTURA - 40))
 
-
-# TIRO (DO JOGADOR)
-class Tiro(Entidade):
-    def __init__(self, x, y):
-        super().__init__(x, y, 10)
-        self.image.fill((255, 255, 0))  # amarelo
-
-    def update(self):
-        self.rect.y -= self.velocidade
-        if self.rect.y < 0:
-            self.kill()
-
+    def atirar(self):
+        Tiro(self.rect.centerx, self.rect.centery)
+        return Tiro(self.rect.centerx, self.rect.centery)
 
 # ROBO BASE
 class Robo(Entidade):
@@ -67,13 +70,35 @@ class RoboZigueZague(Robo):
     def __init__(self, x, y):
         super().__init__(x, y, velocidade=3)
         self.direcao = 1
+        self.ticks = 0
+        self.timeToRevert = random.randint(75, 150)
+
+    def atualizar_posicao(self):
+        if self.ticks == self.timeToRevert:
+            # Inverter a direção a cada X ticks entre 100 e 200
+            self.direcao *= -1
+            self.timeToRevert = random.randint(75, 150)
+            self.ticks = 0
+
+        self.rect.y += self.velocidade
+        self.rect.x += self.direcao * 3
+        if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
+            self.direcao *= -1
+
+    def update(self):
+        self.atualizar_posicao()
+        self.ticks += 1
+        if self.rect.y > ALTURA:
+            self.kill()
+
+# Robô Lento
+class RoboLento(Robo):
+    def __init__(self, x, y):
+        super().__init__(x, y, velocidade=1)
+        self.image.fill((255, 0, 255))  # verde
 
     def atualizar_posicao(self):
         self.rect.y += self.velocidade
-        self.rect.x += self.direcao * 3
-
-        if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
-            self.direcao *= -1
 
     def update(self):
         self.atualizar_posicao()

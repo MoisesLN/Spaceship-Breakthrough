@@ -1,4 +1,4 @@
-from classes import Jogador, Tiro, RoboZigueZague
+from classes import Jogador, RoboZigueZague, RoboLento
 import pygame
 import random
 
@@ -35,24 +35,31 @@ class Game():
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        tiro = Tiro(self.jogador.rect.centerx, self.jogador.rect.y)
+                        tiro = self.jogador.atirar()
                         self.todos_sprites.add(tiro)
                         self.tiros.add(tiro)
 
             # timer de entrada dos inimigos
             self.spawn_timer += 1
             if self.spawn_timer > 40:
-                robo = RoboZigueZague(random.randint(40, LARGURA - 40), -40)
-                self.todos_sprites.add(robo)
-                self.inimigos.add(robo)
-                self.spawn_timer = 0
+                num = random.randint(1, 2)
+                if num == 1:
+                    robo = RoboLento(random.randint(40, LARGURA - 40), -40)
+                    self.todos_sprites.add(robo)
+                    self.inimigos.add(robo)
+                    self.spawn_timer = 0
+                elif num == 2:
+                    robo = RoboZigueZague(random.randint(40, LARGURA - 40), -40)
+                    self.todos_sprites.add(robo)
+                    self.inimigos.add(robo)
+                    self.spawn_timer = 0
 
             # colisão tiro x robô
             colisao = pygame.sprite.groupcollide(self.inimigos, self.tiros, True, True)
             self.pontos += len(colisao)
 
             # colisão robô x jogador
-            if pygame.sprite.spritecollide(self.jogador, self.inimigos, True):
+            if pygame.sprite.spritecollide(self.jogador, self.inimigos, True): #type: ignore
                 self.jogador.vida -= 1
                 if self.jogador.vida <= 0:
                     print("GAME OVER!")
