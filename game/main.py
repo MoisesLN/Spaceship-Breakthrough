@@ -1,4 +1,4 @@
-from classes import Jogador, RoboZigueZague, RoboLento
+from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido
 import pygame
 import random
 
@@ -42,7 +42,7 @@ class Game():
             # timer de entrada dos inimigos
             self.spawn_timer += 1
             if self.spawn_timer > 40:
-                num = random.randint(1, 2)
+                num = random.randint(1, 3)
                 if num == 1:
                     robo = RoboLento(random.randint(40, LARGURA - 40), -40)
                     self.todos_sprites.add(robo)
@@ -50,6 +50,11 @@ class Game():
                     self.spawn_timer = 0
                 elif num == 2:
                     robo = RoboZigueZague(random.randint(40, LARGURA - 40), -40)
+                    self.todos_sprites.add(robo)
+                    self.inimigos.add(robo)
+                    self.spawn_timer = 0
+                elif num == 3:
+                    robo = RoboRapido(random.randint(40, LARGURA - 40), -40)
                     self.todos_sprites.add(robo)
                     self.inimigos.add(robo)
                     self.spawn_timer = 0

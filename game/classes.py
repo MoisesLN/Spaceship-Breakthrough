@@ -95,7 +95,7 @@ class RoboZigueZague(Robo):
 class RoboLento(Robo):
     def __init__(self, x, y):
         super().__init__(x, y, velocidade=1)
-        self.image.fill((255, 0, 255))  # verde
+        self.image.fill((255, 0, 255))  # roxo
 
     def atualizar_posicao(self):
         self.rect.y += self.velocidade
@@ -104,3 +104,27 @@ class RoboLento(Robo):
         self.atualizar_posicao()
         if self.rect.y > ALTURA:
             self.kill()
+            
+# Robô Rápido
+class RoboRapido(Robo):
+    def __init__(self, x, y):
+        super().__init__(x, y, velocidade=7)
+        self.image.fill((0, 0, 255))  # azul
+        self.direcao = 1
+        self.num = random.randint(1, 2)
+
+    def atualizar_posicao(self):
+        if self.num == 1:
+            self.rect.y += self.velocidade
+            self.rect.x += self.direcao * 3
+            if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
+                self.direcao *= -1
+                
+        elif self.num == 2:
+            self.rect.y += self.velocidade
+
+    def update(self):
+        self.atualizar_posicao()
+        if self.rect.y > ALTURA:
+            self.kill()
+            
