@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 LARGURA = 600 
 ALTURA = 720
@@ -108,7 +109,7 @@ class RoboLento(Robo):
 # Robô Rápido
 class RoboRapido(Robo):
     def __init__(self, x, y):
-        super().__init__(x, y, velocidade=7)
+        super().__init__(x, y, velocidade=6)
         self.image.fill((0, 0, 255))  # azul
         self.direcao = 1
         self.num = random.randint(1, 2)
@@ -127,4 +128,32 @@ class RoboRapido(Robo):
         self.atualizar_posicao()
         if self.rect.y > ALTURA:
             self.kill()
-            
+
+# Robô Cíclico
+class RoboCiclico(Robo):
+    # Para fazer o círculo:
+    # x = Xcentro + raio * cos(angulo)
+    # y = ycentro + raio * sin(angulo)
+
+    def __init__(self, x, y):
+        super().__init__(x, y, velocidade=2)
+        self.image.fill((0, 0, 255))  # azul
+        self.direcao = 1
+        self.num = random.randint(1, 2)
+        self.ticksToRotate = 80
+        self.ticks = 0
+        self.x = self.rect.x
+        self.y = self.rect.y
+        self.radius = random.randint(30,70)
+
+    def atualizar_posicao(self):
+        angle = (2 * math.pi / self.ticksToRotate) * self.ticks
+        self.y += self.velocidade
+        self.rect.x = self.x + (self.radius * math.cos(angle))
+        self.rect.y = self.y + (self.radius * math.sin(angle))
+
+    def update(self):
+        self.atualizar_posicao()
+        self.ticks += 1
+        if self.rect.y > ALTURA:
+            self.kill()

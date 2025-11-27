@@ -1,4 +1,4 @@
-from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido
+from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido, RoboCiclico
 import pygame
 import random
 
@@ -7,6 +7,11 @@ pygame.init()
 LARGURA = 600 
 ALTURA = 720
 FPS = 60
+
+def colisaoInimigos(left, right):
+    if left != right:
+        return pygame.sprite.collide_rect(left, right)
+    return False
 
 class Game():
     def __init__(self, largura, altura, FPS):
@@ -42,29 +47,36 @@ class Game():
             # timer de entrada dos inimigos
             self.spawn_timer += 1
             if self.spawn_timer > 40:
-                num = random.randint(1, 3)
-                if num == 1:
-                    robo = RoboLento(random.randint(40, LARGURA - 40), -40)
-                    self.todos_sprites.add(robo)
-                    self.inimigos.add(robo)
-                    self.spawn_timer = 0
-                elif num == 2:
+                # PESOS:
+                # RoboZigueZague: 4
+                # RoboLento: 2
+                # RoboRapido: 2
+                # RoboCiclico: 1
+
+                num = random.randint(1, 9)
+                if num <= 4:
                     robo = RoboZigueZague(random.randint(40, LARGURA - 40), -40)
-                    self.todos_sprites.add(robo)
-                    self.inimigos.add(robo)
-                    self.spawn_timer = 0
-                elif num == 3:
+                elif num <= 6:
+                    robo = RoboLento(random.randint(40, LARGURA - 40), -40)
+                elif num <= 8:
                     robo = RoboRapido(random.randint(40, LARGURA - 40), -40)
-                    self.todos_sprites.add(robo)
-                    self.inimigos.add(robo)
-                    self.spawn_timer = 0
+                elif num == 9:
+                    robo = RoboCiclico(random.randint(90, LARGURA - 90), -40)
+                self.todos_sprites.add(robo)
+                self.inimigos.add(robo)
+                self.spawn_timer = 0
 
             # colisão tiro x robô
             colisao = pygame.sprite.groupcollide(self.inimigos, self.tiros, True, True)
             self.pontos += len(colisao)
 
+            # colisão robô x robô
+            # TODO
+            # for robo in self.inimigos:
+            #     pygame.sprite.spritecollideany(robo, self.inimigos, colisaoInimigos(robo, self.inimigos))
+
             # colisão robô x jogador
-            if pygame.sprite.spritecollide(self.jogador, self.inimigos, True): #type: ignore
+            if pygame.sprite.spritecollide(self.jogador, self.inimigos, True):
                 self.jogador.vida -= 1
                 if self.jogador.vida <= 0:
                     print("GAME OVER!")
