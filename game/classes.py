@@ -157,3 +157,24 @@ class RoboCiclico(Robo):
         self.ticks += 1
         if self.rect.y > ALTURA:
             self.kill()
+            
+class RoboCacador(Robo):
+
+    def __init__(self, x, y, jogador):
+        super().__init__(x, y, velocidade=3)
+        self.image.fill((0, 100, 0))  # verde
+        self.direcao = 1
+        self.jogador = jogador
+        
+    def atualizar_posicao(self):
+        if self.rect.x > self.jogador.rect.x:
+            self.rect.y += self.velocidade
+            self.rect.x -= self.direcao * 3
+        else: 
+            self.rect.y += self.velocidade
+            self.rect.x += self.direcao * 3
+            
+    def update(self):
+        self.atualizar_posicao()
+        if self.rect.y > ALTURA:
+            self.kill()
