@@ -1,4 +1,4 @@
-from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido, RoboCiclico, RoboCacador
+from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido, RoboCiclico, RoboCacador, RoboSaltador
 import pygame
 import random
 
@@ -52,8 +52,10 @@ class Game():
                 # RoboLento: 2
                 # RoboRapido: 2
                 # RoboCiclico: 1
+                # RoboCacador: 1
+                # RoboSaltador: 1
 
-                num = random.randint(1, 10)
+                num = random.randint(1, 11)
                 if num <= 2:
                     robo = RoboZigueZague(random.randint(40, LARGURA - 40), -40)
                 elif num <= 6:
@@ -64,7 +66,9 @@ class Game():
                     robo = RoboCiclico(random.randint(90, LARGURA - 90), -40)
                 elif num == 10:
                     robo = RoboCacador(random.randint(40, LARGURA - 40), -40, self.jogador)
-                self.todos_sprites.add(robo)
+                elif num == 11:
+                    robo = RoboSaltador(random.randint(40, LARGURA - 40), -40)
+                self.todos_sprites.add(robo) 
                 self.inimigos.add(robo)
                 self.spawn_timer = 0
 

@@ -178,3 +178,35 @@ class RoboCacador(Robo):
         self.atualizar_posicao()
         if self.rect.y > ALTURA:
             self.kill()
+            
+class RoboSaltador(Robo):
+    def __init__(self, x, y):
+        super().__init__(x, y, velocidade=3)
+        self.direcao = 1
+        self.image.fill((0, 0, 100))  # azul
+        self.ticks = 0
+        self.timeToRevert = random.randint(70, 150)
+        self.num = random.randint(1,2)
+        self.direcao_salto = random.randint(1,2)
+        self.mudanca_x = random.randint(150,200)
+
+    def atualizar_posicao(self):
+        if self.ticks == self.timeToRevert:
+            self.timeToRevert = random.randint(70, 150)
+            if self.direcao_salto == 1:
+                self.rect.x += self.mudanca_x
+            else:
+                self.rect.x -= self.mudanca_x  
+            self.direcao *= -1    
+
+        self.rect.y += self.velocidade
+        if self.num == 1:
+            self.rect.x += self.direcao * 3
+        else:
+            self.rect.x -= self.direcao * 3
+
+    def update(self):
+        self.atualizar_posicao()
+        self.ticks += 1
+        if self.rect.y > ALTURA:
+            self.kill()
