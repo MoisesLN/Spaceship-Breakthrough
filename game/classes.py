@@ -33,8 +33,13 @@ class Tiro(Entidade):
 class Jogador(Entidade):
     def __init__(self, x, y):
         super().__init__(x, y, 5)
-        self.image.fill((0, 255, 0))  # verde
+        # self.image.fill((0, 255, 0))  # verde
+        self.imagesArray = ['game/sprites/nave/nave_base1.png', 'game/sprites/nave/nave_base2.png', 'game/sprites/nave/nave_base3.png', 'game/sprites/nave/nave_base4.png']
+        self.indexImg = 0
+        self.image = pygame.image.load(self.imagesArray[self.indexImg])
+        self.image = pygame.transform.scale(self.image, (64, 80))
         self.vida = 5
+        self.ticks = 0
 
     def update(self):
         keys = pygame.key.get_pressed()
@@ -51,6 +56,17 @@ class Jogador(Entidade):
         # limites de tela
         self.rect.x = max(0, min(self.rect.x, LARGURA - 40))
         self.rect.y = max(0, min(self.rect.y, ALTURA - 40))
+
+        # Animação das sprites
+        if self.ticks % 4 == 0: # atualizar a cada 4 ticks
+            self.image = pygame.image.load(self.imagesArray[self.indexImg])
+            self.image = pygame.transform.scale(self.image, (64, 80))
+            if self.indexImg == len(self.imagesArray) - 1:
+                self.indexImg = 0
+            else:
+                self.indexImg += 1
+        
+        self.ticks += 1
 
     def atirar(self):
         Tiro(self.rect.centerx, self.rect.centery)
