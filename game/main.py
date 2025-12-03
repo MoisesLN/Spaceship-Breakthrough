@@ -56,7 +56,7 @@ class Game():
                 # RoboSaltador: 1
 
                 num = random.randint(1, 11)
-                if num <= 2:
+                if num <= 4:
                     robo = RoboZigueZague(random.randint(40, LARGURA - 40), -40)
                 elif num <= 6:
                     robo = RoboLento(random.randint(40, LARGURA - 40), -40)

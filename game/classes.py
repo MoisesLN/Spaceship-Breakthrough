@@ -95,7 +95,7 @@ class RoboZigueZague(Robo):
 # Robô Lento
 class RoboLento(Robo):
     def __init__(self, x, y):
-        super().__init__(x, y, velocidade=1)
+        super().__init__(x, y, velocidade=2)
         self.image.fill((255, 0, 255))  # roxo
 
     def atualizar_posicao(self):
@@ -182,28 +182,41 @@ class RoboCacador(Robo):
 class RoboSaltador(Robo):
     def __init__(self, x, y):
         super().__init__(x, y, velocidade=3)
-        self.direcao = 1
+        self.direcao = random.choice([-1, 1])
         self.image.fill((0, 0, 100))  # azul
         self.ticks = 0
-        self.timeToRevert = random.randint(70, 150)
+        self.timeToRevert = random.randint(30, 75)
         self.num = random.randint(1,2)
         self.direcao_salto = random.randint(1,2)
-        self.mudanca_x = random.randint(150,200)
+        self.mudanca_x = random.randint(50, 100)
 
     def atualizar_posicao(self):
+        # Teleportar e inverter direção após teleporte
         if self.ticks == self.timeToRevert:
-            self.timeToRevert = random.randint(70, 150)
+            self.timeToRevert = random.randint(100, 150)
+            # Teleporte para a direita
             if self.direcao_salto == 1:
-                self.rect.x += self.mudanca_x
+                # Não passar da largura da tela
+                if self.rect.x + self.mudanca_x >= LARGURA - 40:
+                    self.rect.x = LARGURA - 45
+                else:
+                    self.rect.x += self.mudanca_x
+            # Teleporte para a esquerda
             else:
-                self.rect.x -= self.mudanca_x  
-            self.direcao *= -1    
+                # Não passar da largura da tela
+                if self.rect.x - self.mudanca_x <= 0:
+                    self.rect.x = 5
+                else:
+                    self.rect.x -= self.mudanca_x  
+            
+            self.direcao *= -1
+        
+        # Se bater numa parede, inverter direção
+        elif self.rect.x >= LARGURA - 40 or self.rect.x <= 0:
+            self.direcao *= -1
 
+        self.rect.x += self.direcao * 3
         self.rect.y += self.velocidade
-        if self.num == 1:
-            self.rect.x += self.direcao * 3
-        else:
-            self.rect.x -= self.direcao * 3
 
     def update(self):
         self.atualizar_posicao()
