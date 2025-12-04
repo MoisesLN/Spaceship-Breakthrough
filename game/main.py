@@ -8,11 +8,6 @@ LARGURA = 600
 ALTURA = 720
 FPS = 60
 
-def colisaoInimigos(left, right):
-    if left != right:
-        return pygame.sprite.collide_rect(left, right)
-    return False
-
 class Game():
     def __init__(self, largura, altura, FPS):
         self.largura = largura
@@ -77,9 +72,12 @@ class Game():
             self.pontos += len(colisao)
 
             # colisão robô x robô
-            # TODO
-            # for robo in self.inimigos:
-            #     pygame.sprite.spritecollideany(robo, self.inimigos, colisaoInimigos(robo, self.inimigos))
+            colisoes = pygame.sprite.groupcollide(self.inimigos, self.inimigos, False, False)
+            for inimigo, lista_colididos in colisoes.items():
+                for collided in lista_colididos:
+                    if inimigo is not collided:
+                        inimigo.kill()
+                        collided.kill()
 
             # colisão robô x jogador
             if pygame.sprite.spritecollide(self.jogador, self.inimigos, True):

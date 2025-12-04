@@ -2,6 +2,7 @@ import pygame
 import random
 import math
 
+# TODO: som de colisão robôs, sistema de VIDA dos robôs, sprites dos robôs
 LARGURA = 600 
 ALTURA = 720
 
@@ -112,7 +113,9 @@ class RoboZigueZague(Robo):
 class RoboLento(Robo):
     def __init__(self, x, y):
         super().__init__(x, y, velocidade=2)
-        self.image.fill((255, 0, 255))  # roxo
+        self.image = pygame.image.load('game/sprites/naveLenta.png')
+        self.image = pygame.transform.scale(self.image, (69, 60))
+        # self.image.fill((255, 0, 255))  # roxo
 
     def atualizar_posicao(self):
         self.rect.y += self.velocidade
