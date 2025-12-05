@@ -69,7 +69,7 @@ class Game():
 
             # colisão tiro x robô
             colisao = pygame.sprite.groupcollide(self.inimigos, self.tiros, True, True)
-            self.pontos += len(colisao)
+            self.pontos += len(colisao) 
 
             # colisão robô x robô
             colisoes = pygame.sprite.groupcollide(self.inimigos, self.inimigos, False, False)
