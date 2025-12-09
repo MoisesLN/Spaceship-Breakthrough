@@ -1,6 +1,7 @@
 from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido, RoboCiclico, RoboCacador, RoboSaltador
 import pygame
 import random
+from menu import Menu
 
 pygame.init()
 
@@ -24,6 +25,8 @@ class Game():
     
     def rodar(self):
         TELA = pygame.display.set_mode((LARGURA, ALTURA))
+        self.fundo = pygame.image.load("game/sprites/background.png")
+    
         pygame.display.set_caption("Robot Defense - Template")
         rodando = True
         while rodando:
@@ -90,11 +93,11 @@ class Game():
             self.todos_sprites.update()
 
             # desenhar
-            TELA.fill((20, 20, 20))
+            TELA.blit(self.fundo, (0,0))
             self.todos_sprites.draw(TELA)
 
             #Painel de pontos e vida
-            font = pygame.font.SysFont(None, 30)
+            font = pygame.font.Font("game/Minecraftia-Regular.ttf", 20)
             texto = font.render(f"Vida: {self.jogador.vida}  |  Pontos: {self.pontos}", True, (255, 255, 255))
             TELA.blit(texto, (10, 10))
 
@@ -103,4 +106,9 @@ class Game():
         pygame.quit()
 
 jogo = Game(LARGURA, ALTURA, FPS)
-jogo.rodar()
+
+if __name__ == '__main__':
+    menu = Menu()
+    menu.run()
+    if not menu.running:
+        jogo.rodar()
