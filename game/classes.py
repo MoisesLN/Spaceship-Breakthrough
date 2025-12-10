@@ -56,8 +56,8 @@ class Jogador(Entidade):
             self.mover(self.velocidade, 0)
 
         # limites de tela
-        self.rect.x = max(0, min(self.rect.x, LARGURA - 40))
-        self.rect.y = max(0, min(self.rect.y, ALTURA - 40))
+        self.rect.x = max(0, min(self.rect.x, LARGURA - 64))
+        self.rect.y = max(0, min(self.rect.y, ALTURA - 80))
 
         # Animação das sprites
         if self.ticks % 4 == 0: # atualizar a cada 4 ticks
@@ -103,7 +103,7 @@ class RoboZigueZague(Robo):
 
         self.rect.y += self.velocidade
         self.rect.x += self.direcao * 3
-        if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
+        if self.rect.x <= 0 or self.rect.x >= LARGURA - 75:
             self.direcao *= -1
 
     def update(self):
@@ -157,7 +157,7 @@ class RoboRapido(Robo):
         if self.num == 1:
             self.rect.y += self.velocidade
             self.rect.x += self.direcao * 3
-            if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
+            if self.rect.x <= 0 or self.rect.x >= LARGURA - 69:
                 self.direcao *= -1
                 
         elif self.num == 2:
