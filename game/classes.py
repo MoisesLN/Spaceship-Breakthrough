@@ -272,7 +272,8 @@ class RoboSaltador(Robo):
     def __init__(self, x, y):
         super().__init__(x, y, velocidade=3)
         self.direcao = random.choice([-1, 1])
-        self.image.fill((0, 0, 100))  # azul
+        self.image = pygame.image.load('game/sprites/naveGlitch.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (75, 75))
         self.ticks = 0
         self.timeToRevert = random.randint(30, 75)
         self.num = random.randint(1,2)
