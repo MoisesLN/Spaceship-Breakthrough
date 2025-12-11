@@ -18,14 +18,15 @@ class Game():
         self.todos_sprites = pygame.sprite.Group()
         self.inimigos = pygame.sprite.Group()
         self.tiros = pygame.sprite.Group()
-        self.jogador = Jogador(LARGURA // 2, ALTURA - 60)
-        self.todos_sprites.add(self.jogador)
+        self.jogador = None # só inicializa quando começar o jogo
         self.pontos = 0
         self.spawn_timer = 0
     
     def rodar(self):
         TELA = pygame.display.set_mode((LARGURA, ALTURA))
         self.fundo = pygame.image.load("game/sprites/background.png")
+        self.jogador = Jogador(LARGURA // 2, ALTURA - 60)
+        self.todos_sprites.add(self.jogador)
     
         pygame.display.set_caption("Robot Defense - Template")
         rodando = True
@@ -55,7 +56,7 @@ class Game():
 
                 num = random.randint(1, 11)
                 if num <= 4:
-                    robo = RoboZigueZague(random.randint(40, LARGURA - 40), -40)
+                    robo = RoboZigueZague(random.randint(40, LARGURA - 60), -40)
                 elif num <= 6:
                     robo = RoboLento(random.randint(40, LARGURA - 40), -40)
                 elif num <= 8:
