@@ -275,6 +275,7 @@ class RoboSaltador(Robo):
         self.direcao = random.choice([-1, 1])
         self.image = pygame.image.load('game/sprites/naveGlitch.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, (75, 75))
+        self.rect = self.image.get_rect(center=(x, y))
         self.ticks = 0
         self.timeToRevert = random.randint(30, 75)
         self.num = random.randint(1,2)
@@ -288,8 +289,8 @@ class RoboSaltador(Robo):
             # Teleporte para a direita
             if self.direcao_salto == 1:
                 # Não passar da largura da tela
-                if self.rect.x + self.mudanca_x >= LARGURA - 40:
-                    self.rect.x = LARGURA - 45
+                if self.rect.x + self.mudanca_x >= LARGURA - 75:
+                    self.rect.x = LARGURA - 80
                 else:
                     self.rect.x += self.mudanca_x
             # Teleporte para a esquerda
@@ -303,7 +304,7 @@ class RoboSaltador(Robo):
             self.direcao *= -1
         
         # Se bater numa parede, inverter direção
-        elif self.rect.x >= LARGURA - 40 or self.rect.x <= 0:
+        if self.rect.x <= 0 or self.rect.x >= LARGURA - 75:
             self.direcao *= -1
 
         self.rect.x += self.direcao * 3
