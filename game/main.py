@@ -27,6 +27,9 @@ class Game():
         self.fundo = pygame.image.load("game/sprites/background.png")
         self.jogador = Jogador(LARGURA // 2, ALTURA - 60)
         self.todos_sprites.add(self.jogador)
+        pygame.mixer.music.load("game/sons/main theme.mp3")
+        pygame.mixer.music.set_volume(0.6)
+        pygame.mixer.music.play(-1)
     
         pygame.display.set_caption("Robot Defense - Template")
         rodando = True

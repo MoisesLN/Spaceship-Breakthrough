@@ -66,6 +66,7 @@ class Menu:
         self.running = True
 
     def start_game(self):
+        pygame.mixer.music.stop()
         self.running = False
 
     def exit_game(self):
@@ -75,6 +76,10 @@ class Menu:
     def run(self):
         clock = pygame.time.Clock()
         self.tela.blit(self.fundo_menu, (0,0))
+        pygame.mixer.music.load("game/sons/title screen.mp3")
+
+        pygame.mixer.music.set_volume(0.6)
+        pygame.mixer.music.play(-1)
         while self.running:
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
