@@ -25,6 +25,7 @@ class Tiro(Entidade):
         super().__init__(x, y, 10)
         self.image = pygame.image.load('game/sprites/tiro.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, (20, 60))
+        self.rect = self.image.get_rect(center=(x, y))
 
     def update(self):
         self.rect.y -= self.velocidade
@@ -44,6 +45,7 @@ class Jogador(Entidade):
             ]
         self.indexImg = 0
         self.image = self.imagesArray[self.indexImg]
+        self.rect = self.image.get_rect(center=(x, y))
         self.vida = 5
         self.ticks = 0
 
@@ -65,12 +67,11 @@ class Jogador(Entidade):
 
         # Animação das sprites
         if self.ticks % 4 == 0: # atualizar a cada 4 ticks
+            old_center = self.rect.center
             self.image = self.imagesArray[self.indexImg]
-            if self.indexImg == len(self.imagesArray) - 1:
-                self.indexImg = 0
-            else:
-                self.indexImg += 1
-        
+            self.rect = self.image.get_rect(center=old_center)
+            self.indexImg = (self.indexImg + 1) % len (self.imagesArray)
+
         self.ticks += 1
 
     def atirar(self):
@@ -93,6 +94,7 @@ class RoboZigueZague(Robo):
         super().__init__(x, y, velocidade=3)
         self.image = pygame.image.load('game/sprites/naveZigZag.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, (75, 75))
+        self.rect = self.image.get_rect(center=(x, y))
         self.direcao = 1
         self.ticks = 0
         self.timeToRevert = random.randint(75, 150)
@@ -139,11 +141,11 @@ class RoboLento(Robo):
             self.kill()
             
         if self.ticks % 4 == 0:
+            old_center = self.rect.center
             self.image = self.imagesArray[self.indexImg]
-            if self.indexImg == len(self.imagesArray) - 1:
-                self.indexImg = 0
-            else:
-                self.indexImg += 1
+            self.rect = self.image.get_rect(center=old_center)
+            self.indexImg = (self.indexImg + 1) % len (self.imagesArray)
+
                 
         self.ticks += 1
             
@@ -179,11 +181,11 @@ class RoboRapido(Robo):
             self.kill()
             
         if self.ticks % 4 == 0:
+            old_center = self.rect.center
             self.image = self.imagesArray[self.indexImg]
-            if self.indexImg == len(self.imagesArray) - 1:
-                self.indexImg = 0
-            else:
-                self.indexImg += 1
+            self.rect = self.image.get_rect(center=old_center)
+            self.indexImg = (self.indexImg + 1) % len (self.imagesArray)
+
                 
         self.ticks += 1
 
@@ -224,11 +226,10 @@ class RoboCiclico(Robo):
             self.kill()
             
         if self.ticks % 4 == 0:
+            old_center = self.rect.center
             self.image = self.imagesArray[self.indexImg]
-            if self.indexImg == len(self.imagesArray) - 1:
-                self.indexImg = 0
-            else:
-                self.indexImg += 1
+            self.rect = self.image.get_rect(center=old_center)
+            self.indexImg = (self.indexImg + 1) % len (self.imagesArray)
             
 class RoboCacador(Robo):
 
@@ -260,11 +261,11 @@ class RoboCacador(Robo):
             self.kill()
             
         if self.ticks % 4 == 0: 
+            old_center = self.rect.center
             self.image = self.imagesArray[self.indexImg]
-            if self.indexImg == len(self.imagesArray) - 1:
-                self.indexImg = 0
-            else:
-                self.indexImg += 1
+            self.rect = self.image.get_rect(center=old_center)
+            self.indexImg = (self.indexImg + 1) % len (self.imagesArray)
+
                 
         self.ticks += 1
             
@@ -273,6 +274,7 @@ class RoboSaltador(Robo):
         super().__init__(x, y, velocidade=3)
         self.direcao = random.choice([-1, 1])
         self.image.fill((0, 0, 100))  # azul
+        self.rect = self.image.get_rect(center=(x, y))
         self.ticks = 0
         self.timeToRevert = random.randint(30, 75)
         self.num = random.randint(1,2)
