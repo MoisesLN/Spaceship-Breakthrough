@@ -23,7 +23,9 @@ class Entidade(pygame.sprite.Sprite):
 class Tiro(Entidade):
     def __init__(self, x, y):
         super().__init__(x, y, 10)
-        self.image.fill((255, 255, 0))  # amarelo
+        self.image = pygame.image.load('game/sprites/tiro.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (20, 60))
+        self.rect = self.image.get_rect(center=(x, y))
 
     def update(self):
         self.rect.y -= self.velocidade
@@ -35,10 +37,15 @@ class Jogador(Entidade):
     def __init__(self, x, y):
         super().__init__(x, y, 5)
         # self.image.fill((0, 255, 0))  # verde
-        self.imagesArray = ['game/sprites/nave/nave_base1.png', 'game/sprites/nave/nave_base2.png', 'game/sprites/nave/nave_base3.png', 'game/sprites/nave/nave_base4.png']
+        self.imagesArray = [
+            pygame.transform.scale(pygame.image.load('game/sprites/nave/nave_base1.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/nave/nave_base2.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/nave/nave_base3.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/nave/nave_base4.png').convert_alpha(), (64, 80)),
+            ]
         self.indexImg = 0
-        self.image = pygame.image.load(self.imagesArray[self.indexImg])
-        self.image = pygame.transform.scale(self.image, (64, 80))
+        self.image = self.imagesArray[self.indexImg]
+        self.rect = self.image.get_rect(center=(x, y))
         self.vida = 5
         self.ticks = 0
 
@@ -55,18 +62,16 @@ class Jogador(Entidade):
             self.mover(self.velocidade, 0)
 
         # limites de tela
-        self.rect.x = max(0, min(self.rect.x, LARGURA - 40))
-        self.rect.y = max(0, min(self.rect.y, ALTURA - 40))
+        self.rect.x = max(0, min(self.rect.x, LARGURA - 64))
+        self.rect.y = max(0, min(self.rect.y, ALTURA - 80))
 
         # Animação das sprites
         if self.ticks % 4 == 0: # atualizar a cada 4 ticks
-            self.image = pygame.image.load(self.imagesArray[self.indexImg])
-            self.image = pygame.transform.scale(self.image, (64, 80))
-            if self.indexImg == len(self.imagesArray) - 1:
-                self.indexImg = 0
-            else:
-                self.indexImg += 1
-        
+            old_center = self.rect.center
+            self.image = self.imagesArray[self.indexImg]
+            self.rect = self.image.get_rect(center=old_center)
+            self.indexImg = (self.indexImg + 1) % len (self.imagesArray)
+
         self.ticks += 1
 
     def atirar(self):
@@ -87,6 +92,9 @@ class Robo(Entidade):
 class RoboZigueZague(Robo):
     def __init__(self, x, y):
         super().__init__(x, y, velocidade=3)
+        self.image = pygame.image.load('game/sprites/naveZigZag.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (75, 75))
+        self.rect = self.image.get_rect(center=(x, y))
         self.direcao = 1
         self.ticks = 0
         self.timeToRevert = random.randint(75, 150)
@@ -100,7 +108,7 @@ class RoboZigueZague(Robo):
 
         self.rect.y += self.velocidade
         self.rect.x += self.direcao * 3
-        if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
+        if self.rect.x <= 0 or self.rect.x >= LARGURA - 75:
             self.direcao *= -1
 
     def update(self):
@@ -113,8 +121,15 @@ class RoboZigueZague(Robo):
 class RoboLento(Robo):
     def __init__(self, x, y):
         super().__init__(x, y, velocidade=2)
-        self.image = pygame.image.load('game/sprites/naveLenta.png')
-        self.image = pygame.transform.scale(self.image, (69, 60))
+        self.imagesArray = [
+            pygame.transform.scale(pygame.image.load('game/sprites/naveLenta/naveLenta1.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/naveLenta/naveLenta2.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/naveLenta/naveLenta3.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/naveLenta/naveLenta4.png').convert_alpha(), (64, 80)),
+            ]
+        self.indexImg = 0
+        self.image = self.imagesArray[self.indexImg]
+        self.ticks = 0
         # self.image.fill((255, 0, 255))  # roxo
 
     def atualizar_posicao(self):
@@ -125,11 +140,28 @@ class RoboLento(Robo):
         if self.rect.y > ALTURA:
             self.kill()
             
+        if self.ticks % 4 == 0:
+            old_center = self.rect.center
+            self.image = self.imagesArray[self.indexImg]
+            self.rect = self.image.get_rect(center=old_center)
+            self.indexImg = (self.indexImg + 1) % len (self.imagesArray)
+
+                
+        self.ticks += 1
+            
 # Robô Rápido
 class RoboRapido(Robo):
     def __init__(self, x, y):
         super().__init__(x, y, velocidade=6)
-        self.image.fill((0, 0, 255))  # azul
+        self.imagesArray = [
+            pygame.transform.scale(pygame.image.load('game/sprites/naveRapida/naveRapida1.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/naveRapida/naveRapida2.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/naveRapida/naveRapida3.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/naveRapida/naveRapida4.png').convert_alpha(), (64, 80)),
+            ]
+        self.indexImg = 0
+        self.image = self.imagesArray[self.indexImg]
+        self.ticks = 0
         self.direcao = 1
         self.num = random.randint(1, 2)
 
@@ -137,7 +169,7 @@ class RoboRapido(Robo):
         if self.num == 1:
             self.rect.y += self.velocidade
             self.rect.x += self.direcao * 3
-            if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
+            if self.rect.x <= 0 or self.rect.x >= LARGURA - 69:
                 self.direcao *= -1
                 
         elif self.num == 2:
@@ -147,6 +179,15 @@ class RoboRapido(Robo):
         self.atualizar_posicao()
         if self.rect.y > ALTURA:
             self.kill()
+            
+        if self.ticks % 4 == 0:
+            old_center = self.rect.center
+            self.image = self.imagesArray[self.indexImg]
+            self.rect = self.image.get_rect(center=old_center)
+            self.indexImg = (self.indexImg + 1) % len (self.imagesArray)
+
+                
+        self.ticks += 1
 
 # Robô Cíclico
 class RoboCiclico(Robo):
@@ -156,7 +197,14 @@ class RoboCiclico(Robo):
 
     def __init__(self, x, y):
         super().__init__(x, y, velocidade=2)
-        self.image.fill((0, 0, 255))  # azul
+        self.imagesArray = [
+            pygame.transform.scale(pygame.image.load('game/sprites/naveCiclica/naveCiclica1.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/naveCiclica/naveCiclica2.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/naveCiclica/naveCiclica3.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/naveCiclica/naveCiclica4.png').convert_alpha(), (64, 80)),
+            ]
+        self.indexImg = 0
+        self.image = self.imagesArray[self.indexImg]
         self.direcao = 1
         self.num = random.randint(1, 2)
         self.ticksToRotate = 80
@@ -177,11 +225,25 @@ class RoboCiclico(Robo):
         if self.rect.y > ALTURA:
             self.kill()
             
+        if self.ticks % 4 == 0:
+            old_center = self.rect.center
+            self.image = self.imagesArray[self.indexImg]
+            self.rect = self.image.get_rect(center=old_center)
+            self.indexImg = (self.indexImg + 1) % len (self.imagesArray)
+            
 class RoboCacador(Robo):
 
     def __init__(self, x, y, jogador):
         super().__init__(x, y, velocidade=3)
-        self.image.fill((0, 100, 0))  # verde
+        self.imagesArray = [
+            pygame.transform.scale(pygame.image.load('game/sprites/naveCacador/naveCacador1.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/naveCacador/naveCacador2.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/naveCacador/naveCacador3.png').convert_alpha(), (64, 80)),
+            pygame.transform.scale(pygame.image.load('game/sprites/naveCacador/naveCacador4.png').convert_alpha(), (64, 80)),
+            ]
+        self.indexImg = 0
+        self.image = self.imagesArray[self.indexImg]
+        self.ticks = 0
         self.direcao = 1
         self.jogador = jogador
         
@@ -198,11 +260,22 @@ class RoboCacador(Robo):
         if self.rect.y > ALTURA:
             self.kill()
             
+        if self.ticks % 4 == 0: 
+            old_center = self.rect.center
+            self.image = self.imagesArray[self.indexImg]
+            self.rect = self.image.get_rect(center=old_center)
+            self.indexImg = (self.indexImg + 1) % len (self.imagesArray)
+
+                
+        self.ticks += 1
+            
 class RoboSaltador(Robo):
     def __init__(self, x, y):
         super().__init__(x, y, velocidade=3)
         self.direcao = random.choice([-1, 1])
-        self.image.fill((0, 0, 100))  # azul
+        self.image = pygame.image.load('game/sprites/naveGlitch.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (75, 75))
+        self.rect = self.image.get_rect(center=(x, y))
         self.ticks = 0
         self.timeToRevert = random.randint(30, 75)
         self.num = random.randint(1,2)
@@ -216,8 +289,8 @@ class RoboSaltador(Robo):
             # Teleporte para a direita
             if self.direcao_salto == 1:
                 # Não passar da largura da tela
-                if self.rect.x + self.mudanca_x >= LARGURA - 40:
-                    self.rect.x = LARGURA - 45
+                if self.rect.x + self.mudanca_x >= LARGURA - 75:
+                    self.rect.x = LARGURA - 80
                 else:
                     self.rect.x += self.mudanca_x
             # Teleporte para a esquerda
@@ -231,7 +304,7 @@ class RoboSaltador(Robo):
             self.direcao *= -1
         
         # Se bater numa parede, inverter direção
-        elif self.rect.x >= LARGURA - 40 or self.rect.x <= 0:
+        if self.rect.x <= 0 or self.rect.x >= LARGURA - 75:
             self.direcao *= -1
 
         self.rect.x += self.direcao * 3

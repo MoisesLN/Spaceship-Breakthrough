@@ -1,6 +1,7 @@
 from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido, RoboCiclico, RoboCacador, RoboSaltador
 import pygame
 import random
+from menu import Menu
 
 pygame.init()
 
@@ -17,13 +18,19 @@ class Game():
         self.todos_sprites = pygame.sprite.Group()
         self.inimigos = pygame.sprite.Group()
         self.tiros = pygame.sprite.Group()
-        self.jogador = Jogador(LARGURA // 2, ALTURA - 60)
-        self.todos_sprites.add(self.jogador)
+        self.jogador = None # só inicializa quando começar o jogo
         self.pontos = 0
         self.spawn_timer = 0
     
     def rodar(self):
         TELA = pygame.display.set_mode((LARGURA, ALTURA))
+        self.fundo = pygame.image.load("game/sprites/background.png")
+        self.jogador = Jogador(LARGURA // 2, ALTURA - 60)
+        self.todos_sprites.add(self.jogador)
+        pygame.mixer.music.load("game/sons/Main Theme.mp3")
+        pygame.mixer.music.set_volume(0.6)
+        pygame.mixer.music.play(-1)
+    
         pygame.display.set_caption("Robot Defense - Template")
         rodando = True
         while rodando:
@@ -52,7 +59,7 @@ class Game():
 
                 num = random.randint(1, 11)
                 if num <= 4:
-                    robo = RoboZigueZague(random.randint(40, LARGURA - 40), -40)
+                    robo = RoboZigueZague(random.randint(40, LARGURA - 60), -40)
                 elif num <= 6:
                     robo = RoboLento(random.randint(40, LARGURA - 40), -40)
                 elif num <= 8:
@@ -69,7 +76,7 @@ class Game():
 
             # colisão tiro x robô
             colisao = pygame.sprite.groupcollide(self.inimigos, self.tiros, True, True)
-            self.pontos += len(colisao)
+            self.pontos += len(colisao) 
 
             # colisão robô x robô
             colisoes = pygame.sprite.groupcollide(self.inimigos, self.inimigos, False, False)
@@ -90,11 +97,11 @@ class Game():
             self.todos_sprites.update()
 
             # desenhar
-            TELA.fill((20, 20, 20))
+            TELA.blit(self.fundo, (0,0))
             self.todos_sprites.draw(TELA)
 
             #Painel de pontos e vida
-            font = pygame.font.SysFont(None, 30)
+            font = pygame.font.Font("game/Minecraftia-Regular.ttf", 20)
             texto = font.render(f"Vida: {self.jogador.vida}  |  Pontos: {self.pontos}", True, (255, 255, 255))
             TELA.blit(texto, (10, 10))
 
@@ -103,4 +110,9 @@ class Game():
         pygame.quit()
 
 jogo = Game(LARGURA, ALTURA, FPS)
-jogo.rodar()
+
+if __name__ == '__main__':
+    menu = Menu()
+    menu.run()
+    if not menu.running:
+        jogo.rodar()
