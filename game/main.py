@@ -1,4 +1,4 @@
-from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido, RoboCiclico, RoboCacador, RoboSaltador
+from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido, RoboCiclico, RoboCacador, RoboSaltador, EasterEgg
 import pygame
 import random
 from menu import Menu
@@ -21,6 +21,7 @@ class Game():
         self.jogador = None # só inicializa quando começar o jogo
         self.pontos = 0
         self.spawn_timer = 0
+        self.easter_egg = EasterEgg()
     
     def rodar(self):
         TELA = pygame.display.set_mode((LARGURA, ALTURA))
@@ -95,6 +96,23 @@ class Game():
 
             # atualizar
             self.todos_sprites.update()
+            
+            if self.jogador.rect.bottom >= ALTURA:
+                self.jogador.rect.bottom = ALTURA
+                self.easter_egg.adicionar_colisao("baixo")
+
+            if self.jogador.rect.right >= LARGURA and self.jogador.rect.centery < ALTURA // 2:
+                self.jogador.rect.right = LARGURA
+                self.easter_egg.adicionar_colisao("direita")
+
+            if self.jogador.rect.left <= 0 and self.jogador.rect.centery < ALTURA // 2:
+                self.jogador.rect.left = 0
+                self.easter_egg.adicionar_colisao("esquerda")
+
+            if self.easter_egg.ativo:
+                self.easter_egg.invocar_chuva_de_balas(self.tiros)
+                self.todos_sprites.add(self.tiros)
+                self.easter_egg.ativo = False
 
             # desenhar
             TELA.blit(self.fundo, (0,0))

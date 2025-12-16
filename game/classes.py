@@ -62,8 +62,8 @@ class Jogador(Entidade):
             self.mover(self.velocidade, 0)
 
         # limites de tela
-        self.rect.x = max(0, min(self.rect.x, LARGURA - 64))
-        self.rect.y = max(0, min(self.rect.y, ALTURA - 80))
+        self.rect.x = max(-5, min(self.rect.x, LARGURA - 59))
+        self.rect.y = max(-5, min(self.rect.y, ALTURA - 75))
 
         # Animação das sprites
         if self.ticks % 4 == 0: # atualizar a cada 4 ticks
@@ -75,7 +75,6 @@ class Jogador(Entidade):
         self.ticks += 1
 
     def atirar(self):
-        Tiro(self.rect.centerx, self.rect.centery)
         return Tiro(self.rect.centerx, self.rect.centery)
 
 # ROBO BASE
@@ -315,3 +314,30 @@ class RoboSaltador(Robo):
         self.ticks += 1
         if self.rect.y > ALTURA:
             self.kill()
+
+class EasterEgg:
+    def __init__(self):
+        self.colisoes = []
+        self.ativo = False
+        self.ultima_colisao = None
+
+    def adicionar_colisao(self, parede):
+        if self.ativo:
+            return
+
+        if parede == self.ultima_colisao:
+            return
+
+        self.ultima_colisao = parede
+        self.colisoes.append(parede)
+
+        if len(self.colisoes) > 3:
+            self.colisoes.pop(0)
+
+        if self.colisoes == ["baixo", "direita", "esquerda"]:
+            self.ativo = True
+
+    def invocar_chuva_de_balas(self, grupo_tiros):
+        for x in range(0, LARGURA, 40):
+            tiro = Tiro(x, ALTURA - 20)
+            grupo_tiros.add(tiro)   
