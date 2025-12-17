@@ -83,7 +83,7 @@ class Game():
 
             # Ao matar inimigos, chance de dropar powerup
             for inimigo, lista_tiros in colisao.items():
-                if random.random() < 0.25:
+                if random.random() < 0.1:
                     tipo = random.choice(['vida', 'velocidade', 'tiro_triplo'])
                     px, py = inimigo.rect.centerx, inimigo.rect.centery
                     power = PowerUp(px, py, tipo)
