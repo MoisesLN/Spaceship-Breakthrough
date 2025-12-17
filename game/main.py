@@ -80,26 +80,19 @@ class Game():
                 self.spawn_timer = 0
 
             # colisão tiro x robô
-            colisao = pygame.sprite.groupcollide(self.inimigos, self.tiros, True, True)
-            self.pontos += len(colisao) 
-
-            # Ao matar inimigos, chance de dropar powerup
-            for inimigo, lista_tiros in colisao.items():
-                pygame.mixer.Sound("game/sons/explosao.mp3").play()
-                if random.random() < 0.25:
-                    tipo = random.choice(['vida', 'velocidade', 'tiro_triplo'])
-                    px, py = inimigo.rect.centerx, inimigo.rect.centery
-                    power = PowerUp(px, py, tipo)
-                    self.todos_sprites.add(power)
-                    self.powerups.add(power)
+            colisao = pygame.sprite.groupcollide(self.inimigos, self.tiros, False, True)
+            for inimigo, tiro in colisao.items():
+                if inimigo.tomarDano() == 'morto':
+                    self.spawnarPowerUp(inimigo)
+                    self.pontos += 1
 
             # colisão robô x robô
             colisoes = pygame.sprite.groupcollide(self.inimigos, self.inimigos, False, False)
             for inimigo, lista_colididos in colisoes.items():
                 for collided in lista_colididos:
                     if inimigo is not collided:
-                        inimigo.kill()
-                        collided.kill()
+                        inimigo.tomarDano()
+                        collided.tomarDano()
 
             # colisão robô x jogador
             if pygame.sprite.spritecollide(self.jogador, self.inimigos, True):
@@ -162,6 +155,14 @@ class Game():
             pygame.display.flip()
 
         return
+    
+    def spawnarPowerUp(self, inimigo):
+        if random.random() < 0.1:
+            tipo = random.choice(['vida', 'velocidade', 'tiro_triplo'])
+            px, py = inimigo.rect.centerx, inimigo.rect.centery
+            power = PowerUp(px, py, tipo)
+            self.todos_sprites.add(power)
+            self.powerups.add(power)
 
 if __name__ == '__main__':
     while True:
