@@ -1,4 +1,4 @@
-from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido, RoboCiclico, RoboCacador, RoboSaltador, EasterEgg
+from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido, RoboCiclico, RoboCacador, RoboSaltador, EasterEgg, PowerUp
 import pygame
 import random
 from menu import Menu
@@ -18,10 +18,11 @@ class Game():
         self.todos_sprites = pygame.sprite.Group()
         self.inimigos = pygame.sprite.Group()
         self.tiros = pygame.sprite.Group()
+        self.powerups = pygame.sprite.Group()
         self.jogador = None # só inicializa quando começar o jogo
         self.pontos = 0
         self.spawn_timer = 0
-        self.easter_egg = EasterEgg()
+        self.easter_egg = EasterEgg() 
     
     def rodar(self):
         TELA = pygame.display.set_mode((LARGURA, ALTURA))
@@ -43,9 +44,10 @@ class Game():
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        tiro = self.jogador.atirar()
-                        self.todos_sprites.add(tiro)
-                        self.tiros.add(tiro)
+                        tiros = self.jogador.atirar()
+                        for tiro in tiros:
+                            self.todos_sprites.add(tiro)
+                            self.tiros.add(tiro)   
 
             # timer de entrada dos inimigos
             self.spawn_timer += 1
@@ -79,6 +81,15 @@ class Game():
             colisao = pygame.sprite.groupcollide(self.inimigos, self.tiros, True, True)
             self.pontos += len(colisao) 
 
+            # Ao matar inimigos, chance de dropar powerup
+            for inimigo, lista_tiros in colisao.items():
+                if random.random() < 0.25:
+                    tipo = random.choice(['vida', 'velocidade', 'tiro_triplo'])
+                    px, py = inimigo.rect.centerx, inimigo.rect.centery
+                    power = PowerUp(px, py, tipo)
+                    self.todos_sprites.add(power)
+                    self.powerups.add(power)
+
             # colisão robô x robô
             colisoes = pygame.sprite.groupcollide(self.inimigos, self.inimigos, False, False)
             for inimigo, lista_colididos in colisoes.items():
@@ -93,6 +104,19 @@ class Game():
                 if self.jogador.vida <= 0:
                     print("GAME OVER!")
                     rodando = False
+
+            # colisão jogador x powerup
+            coletados = pygame.sprite.spritecollide(self.jogador, self.powerups, True)
+            for p in coletados:
+                # durações em frames (por exemplo 5s para velocidade, 6s para triplo)
+                dur_speed = 5 * self.FPS
+                dur_triple = 6 * self.FPS
+                if p.tipo == 'vida':
+                    self.jogador.aplicar_powerup('vida')
+                elif p.tipo == 'velocidade':
+                    self.jogador.aplicar_powerup('velocidade', duracao_frames=dur_speed)
+                elif p.tipo == 'tiro_triplo':
+                    self.jogador.aplicar_powerup('tiro_triplo', duracao_frames=dur_triple)
 
             # atualizar
             self.todos_sprites.update()
@@ -110,8 +134,7 @@ class Game():
                 self.easter_egg.adicionar_colisao("esquerda")
 
             if self.easter_egg.ativo:
-                self.easter_egg.invocar_chuva_de_balas(self.tiros)
-                self.todos_sprites.add(self.tiros)
+                self.easter_egg.invocar_chuva_de_balas(self.tiros, self.todos_sprites)
                 self.easter_egg.ativo = False
 
             # desenhar

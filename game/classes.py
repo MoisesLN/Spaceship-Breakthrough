@@ -32,22 +32,42 @@ class Tiro(Entidade):
         if self.rect.y < 0:
             self.kill()
 
+class TiroInclinado(Tiro):
+    def __init__(self, x, y, direcao):
+        super().__init__(x, y)
+        self.direcao = direcao
+
+    def update(self):
+        self.rect.y -= self.velocidade
+        self.rect.x += self.direcao * 3
+        if self.rect.y < 0:
+            self.kill()
+
 # JOGADOR
 class Jogador(Entidade):
     def __init__(self, x, y):
-        super().__init__(x, y, 5)
-        # self.image.fill((0, 255, 0))  # verde
+        self.base_speed = 5
+        super().__init__(x, y, self.base_speed)
+
         self.imagesArray = [
             pygame.transform.scale(pygame.image.load('game/sprites/nave/nave_base1.png').convert_alpha(), (64, 80)),
             pygame.transform.scale(pygame.image.load('game/sprites/nave/nave_base2.png').convert_alpha(), (64, 80)),
             pygame.transform.scale(pygame.image.load('game/sprites/nave/nave_base3.png').convert_alpha(), (64, 80)),
             pygame.transform.scale(pygame.image.load('game/sprites/nave/nave_base4.png').convert_alpha(), (64, 80)),
-            ]
+        ]
         self.indexImg = 0
         self.image = self.imagesArray[self.indexImg]
         self.rect = self.image.get_rect(center=(x, y))
+
         self.vida = 5
         self.ticks = 0
+
+        self.power_timers = {
+            'velocidade': 0,
+            'tiro_triplo': 0
+        }
+        self.tiro_triplo = False
+        self.velocidade = self.base_speed
 
     def update(self):
         keys = pygame.key.get_pressed()
@@ -66,16 +86,48 @@ class Jogador(Entidade):
         self.rect.y = max(-5, min(self.rect.y, ALTURA - 75))
 
         # Animação das sprites
-        if self.ticks % 4 == 0: # atualizar a cada 4 ticks
+        if self.ticks % 4 == 0:  # atualizar a cada 4 ticks
             old_center = self.rect.center
             self.image = self.imagesArray[self.indexImg]
             self.rect = self.image.get_rect(center=old_center)
-            self.indexImg = (self.indexImg + 1) % len (self.imagesArray)
+            self.indexImg = (self.indexImg + 1) % len(self.imagesArray)
 
         self.ticks += 1
 
+        # reduzir timers de powerups (1 frame por update)
+        if self.power_timers['velocidade'] > 0:
+            self.power_timers['velocidade'] -= 1
+            if self.power_timers['velocidade'] == 0:
+                self.velocidade = self.base_speed
+
+        if self.power_timers['tiro_triplo'] > 0:
+            self.power_timers['tiro_triplo'] -= 1
+            if self.power_timers['tiro_triplo'] == 0:
+                self.tiro_triplo = False
+
     def atirar(self):
-        return Tiro(self.rect.centerx, self.rect.centery)
+        tiros = []
+        tiros.append(Tiro(self.rect.centerx, self.rect.centery))
+
+        if self.tiro_triplo:
+            tiros.append(TiroInclinado(self.rect.centerx, self.rect.centery, -1))
+            tiros.append(TiroInclinado(self.rect.centerx, self.rect.centery, 1))
+
+        return tiros
+
+    def aplicar_powerup(self, tipo, duracao_frames=0):
+
+        if tipo == 'vida':
+            self.vida += 1
+        elif tipo == 'velocidade':
+
+            self.velocidade = self.base_speed + 3  # ajuste se quiser menos/mais
+            self.power_timers['velocidade'] = duracao_frames
+        elif tipo == 'tiro_triplo':
+            self.tiro_triplo = True
+            self.power_timers['tiro_triplo'] = duracao_frames
+
+
 
 # ROBO BASE
 class Robo(Entidade):
@@ -315,6 +367,35 @@ class RoboSaltador(Robo):
         if self.rect.y > ALTURA:
             self.kill()
 
+class PowerUp(Entidade):
+    def __init__(self, x, y, tipo):
+        super().__init__(x, y, velocidade=2)
+        self.tipo = tipo
+
+        if tipo == 'vida':
+            self.image = pygame.image.load(
+                'game/sprites/upgradeVida.png'
+            ).convert_alpha()
+
+        elif tipo == 'velocidade':
+            self.image = pygame.image.load(
+                'game/sprites/upgradeVelocidade.png'
+            ).convert_alpha()
+
+        elif tipo == 'tiro_triplo':
+            self.image = pygame.image.load(
+                'game/sprites/upgradeTiro_triplo.png'
+            ).convert_alpha()
+
+        self.image = pygame.transform.scale(self.image, (40, 40))
+        self.rect = self.image.get_rect(center=(x, y))
+
+    def update(self):
+        self.rect.y += self.velocidade
+
+        if self.rect.top > ALTURA:
+            self.kill()
+
 class EasterEgg:
     def __init__(self):
         self.colisoes = []
@@ -337,7 +418,8 @@ class EasterEgg:
         if self.colisoes == ["baixo", "direita", "esquerda"]:
             self.ativo = True
 
-    def invocar_chuva_de_balas(self, grupo_tiros):
+    def invocar_chuva_de_balas(self, grupo_tiros, todos_sprites):
         for x in range(0, LARGURA, 40):
             tiro = Tiro(x, ALTURA - 20)
-            grupo_tiros.add(tiro)   
+            grupo_tiros.add(tiro)
+            todos_sprites.add(tiro)  
