@@ -31,7 +31,7 @@ class Game():
         self.jogador = Jogador(LARGURA // 2, ALTURA - 60)
         self.todos_sprites.add(self.jogador)
         pygame.mixer.music.load("game/sons/Main Theme.mp3")
-        pygame.mixer.music.set_volume(0.6)
+        pygame.mixer.music.set_volume(0.4)
         pygame.mixer.music.play(-1)
     
         pygame.display.set_caption("Robot Defense - Template")
@@ -80,9 +80,12 @@ class Game():
                 self.spawn_timer = 0
 
             # colisão tiro x robô
+            som_explosao = pygame.mixer.Sound("game/sons/explosao.mp3")
+            som_explosao.set_volume(0.5)
             colisao = pygame.sprite.groupcollide(self.inimigos, self.tiros, False, True)
             for inimigo, tiro in colisao.items():
                 if inimigo.tomarDano() == 'morto':
+                    som_explosao.play()
                     self.spawnarPowerUp(inimigo)
                     self.pontos += 1
 
@@ -104,11 +107,15 @@ class Game():
 
             # colisão jogador x powerup
             coletados = pygame.sprite.spritecollide(self.jogador, self.powerups, True)
+            som_upgrade = pygame.mixer.Sound("game/sons/upgrade.mp3")
+            som_upgrade.set_volume(0.5)
             for p in coletados:
                 # durações em frames (por exemplo 5s para velocidade, 6s para triplo)
                 dur_speed = 5 * self.FPS
                 dur_triple = 6 * self.FPS
-                pygame.mixer.Sound("game/sons/upgrade.mp3").play()
+                
+                som_upgrade.play()
+
                 if p.tipo == 'vida':
                     self.jogador.aplicar_powerup('vida')
                 elif p.tipo == 'velocidade':
@@ -145,7 +152,7 @@ class Game():
             texto_pontos = font.render(f"Pontos: {self.pontos}", True, (255, 255, 255))
             vida_image = pygame.image.load("game/sprites/medalhaVida.png")
             vida_image = pygame.transform.scale(vida_image, (30, 40))
-            pontos_image = pygame.image.load("game/sprites/medalhaVida.png")
+            pontos_image = pygame.image.load("game/sprites/pontuacao.png")
             pontos_image = pygame.transform.scale(pontos_image, (30, 40))
             TELA.blit(pontos_image, (10, 60))
             TELA.blit(texto_vida, (50, 20))
