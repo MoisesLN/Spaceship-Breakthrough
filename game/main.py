@@ -2,6 +2,7 @@ from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido, RoboCiclico,
 import pygame
 import random
 from menu import Menu
+from gameover import GameOver
 
 pygame.init()
 
@@ -41,6 +42,7 @@ class Game():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     rodando = False
+                    pygame.quit()
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
@@ -83,8 +85,7 @@ class Game():
                 if inimigo.tomarDano() == 'morto':
                     self.spawnarPowerUp(inimigo)
                     self.pontos += 1
-            # Ao matar inimigos, chance de dropar powerup
-            
+
             # colisão robô x robô
             colisoes = pygame.sprite.groupcollide(self.inimigos, self.inimigos, False, False)
             for inimigo, lista_colididos in colisoes.items():
@@ -97,8 +98,9 @@ class Game():
             if pygame.sprite.spritecollide(self.jogador, self.inimigos, True):
                 self.jogador.vida -= 1
                 if self.jogador.vida <= 0:
-                    print("GAME OVER!")
                     rodando = False
+                    GameOver().run()
+                    
 
             # colisão jogador x powerup
             coletados = pygame.sprite.spritecollide(self.jogador, self.powerups, True)
@@ -106,6 +108,7 @@ class Game():
                 # durações em frames (por exemplo 5s para velocidade, 6s para triplo)
                 dur_speed = 5 * self.FPS
                 dur_triple = 6 * self.FPS
+                pygame.mixer.Sound("game/sons/upgrade.mp3").play()
                 if p.tipo == 'vida':
                     self.jogador.aplicar_powerup('vida')
                 elif p.tipo == 'velocidade':
@@ -138,13 +141,21 @@ class Game():
 
             #Painel de pontos e vida
             font = pygame.font.Font("game/Minecraftia-Regular.ttf", 20)
-            texto = font.render(f"Vida: {self.jogador.vida}  |  Pontos: {self.pontos}", True, (255, 255, 255))
-            TELA.blit(texto, (10, 10))
+            texto_vida = font.render(f"Vidas: {self.jogador.vida}", True, (255, 255, 255))
+            texto_pontos = font.render(f"Pontos: {self.pontos}", True, (255, 255, 255))
+            vida_image = pygame.image.load("game/sprites/medalhaVida.png")
+            vida_image = pygame.transform.scale(vida_image, (30, 40))
+            pontos_image = pygame.image.load("game/sprites/medalhaVida.png")
+            pontos_image = pygame.transform.scale(pontos_image, (30, 40))
+            TELA.blit(pontos_image, (10, 60))
+            TELA.blit(texto_vida, (50, 20))
+            TELA.blit(texto_pontos, (50, 70))
+            TELA.blit(vida_image, (10, 10))
 
             pygame.display.flip()
 
-        pygame.quit()
-
+        return
+    
     def spawnarPowerUp(self, inimigo):
         if random.random() < 0.1:
             tipo = random.choice(['vida', 'velocidade', 'tiro_triplo'])
@@ -153,11 +164,10 @@ class Game():
             self.todos_sprites.add(power)
             self.powerups.add(power)
 
-
-jogo = Game(LARGURA, ALTURA, FPS)
-
 if __name__ == '__main__':
-    menu = Menu()
-    menu.run()
-    if not menu.running:
-        jogo.rodar()
+    while True:
+        menu = Menu()
+        menu.run()
+        if not menu.running:
+            jogo = Game(LARGURA, ALTURA, FPS)
+            jogo.rodar()
