@@ -137,6 +137,12 @@ class Robo(Entidade):
 
     def atualizar_posicao(self):
         raise NotImplementedError
+    
+    def tomarDano(self):
+        self.vida -= 1
+        if self.vida <=0:
+            self.kill()
+            return 'morto'
 
 
 # ROBO EXEMPLO — ZigueZague
@@ -149,6 +155,7 @@ class RoboZigueZague(Robo):
         self.direcao = 1
         self.ticks = 0
         self.timeToRevert = random.randint(75, 150)
+        self.vida = 1
 
     def atualizar_posicao(self):
         if self.ticks == self.timeToRevert:
@@ -181,6 +188,7 @@ class RoboLento(Robo):
         self.indexImg = 0
         self.image = self.imagesArray[self.indexImg]
         self.ticks = 0
+        self.vida = 1
         # self.image.fill((255, 0, 255))  # roxo
 
     def atualizar_posicao(self):
@@ -215,6 +223,7 @@ class RoboRapido(Robo):
         self.ticks = 0
         self.direcao = 1
         self.num = random.randint(1, 2)
+        self.vida = 2
 
     def atualizar_posicao(self):
         if self.num == 1:
@@ -263,6 +272,7 @@ class RoboCiclico(Robo):
         self.x = self.rect.x
         self.y = self.rect.y
         self.radius = random.randint(30,70)
+        self.vida = 3
 
     def atualizar_posicao(self):
         angle = (2 * math.pi / self.ticksToRotate) * self.ticks
@@ -297,6 +307,7 @@ class RoboCacador(Robo):
         self.ticks = 0
         self.direcao = 1
         self.jogador = jogador
+        self.vida = 3
         
     def atualizar_posicao(self):
         if self.rect.x > self.jogador.rect.x:
@@ -332,6 +343,7 @@ class RoboSaltador(Robo):
         self.num = random.randint(1,2)
         self.direcao_salto = random.randint(1,2)
         self.mudanca_x = random.randint(50, 100)
+        self.vida = 3
 
     def atualizar_posicao(self):
         # Teleportar e inverter direção após teleporte
@@ -366,6 +378,16 @@ class RoboSaltador(Robo):
         self.ticks += 1
         if self.rect.y > ALTURA:
             self.kill()
+
+class BossFinal(Robo):
+    def __init__(self, x, y, velocidade):
+        super().__init__(x, y, velocidade)
+        self.image = pygame.image.load('game/sprites/naveBoss.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (LARGURA, LARGURA))
+        self.rect = self.image.get_rect(center=(x, y))
+        self.ticks = 0
+        self.vida = 50
+        self.vivo = False
 
 class PowerUp(Entidade):
     def __init__(self, x, y, tipo):
@@ -422,4 +444,4 @@ class EasterEgg:
         for x in range(0, LARGURA, 40):
             tiro = Tiro(x, ALTURA - 20)
             grupo_tiros.add(tiro)
-            todos_sprites.add(tiro)  
+            todos_sprites.add(tiro)
