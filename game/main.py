@@ -1,4 +1,4 @@
-from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido, RoboCiclico, RoboCacador, RoboSaltador, EasterEgg, PowerUp
+from classes import Jogador, RoboZigueZague, RoboLento, RoboRapido, RoboCiclico, RoboCacador, RoboSaltador, EasterEgg, PowerUp, BossFinal
 import pygame
 import random
 from menu import Menu
@@ -23,6 +23,7 @@ class Game():
         self.pontos = 0
         self.spawn_timer = 0
         self.easter_egg = EasterEgg() 
+        self.bossFinal = None
     
     def rodar(self):
         TELA = pygame.display.set_mode((LARGURA, ALTURA))
@@ -51,40 +52,26 @@ class Game():
 
             # timer de entrada dos inimigos
             self.spawn_timer += 1
-            if self.spawn_timer > 40:
-                # PESOS:
-                # RoboZigueZague: 4
-                # RoboLento: 2
-                # RoboRapido: 2
-                # RoboCiclico: 1
-                # RoboCacador: 1
-                # RoboSaltador: 1
 
-                num = random.randint(1, 11)
-                if num <= 4:
-                    robo = RoboZigueZague(random.randint(40, LARGURA - 60), -40)
-                elif num <= 6:
-                    robo = RoboLento(random.randint(40, LARGURA - 40), -40)
-                elif num <= 8:
-                    robo = RoboRapido(random.randint(40, LARGURA - 40), -40)
-                elif num == 9:
-                    robo = RoboCiclico(random.randint(90, LARGURA - 90), -40)
-                elif num == 10:
-                    robo = RoboCacador(random.randint(40, LARGURA - 40), -40, self.jogador)
-                elif num == 11:
-                    robo = RoboSaltador(random.randint(40, LARGURA - 40), -40)
-                self.todos_sprites.add(robo) 
-                self.inimigos.add(robo)
-                self.spawn_timer = 0
+            if self.bossFinal:
+                if self.spawn_timer > 30:
+                    self.spawnarRobo(300, self.bossFinal.rect.x)
+
+
+            elif self.spawn_timer > 40:
+                self.spawnarRobo(0)
 
             # colisão tiro x robô
             colisao = pygame.sprite.groupcollide(self.inimigos, self.tiros, False, True)
             for inimigo, tiro in colisao.items():
                 if inimigo.tomarDano() == 'morto':
+                    # Ao matar inimigos, chance de dropar powerup
                     self.spawnarPowerUp(inimigo)
                     self.pontos += 1
-            # Ao matar inimigos, chance de dropar powerup
             
+            if self.pontos == 1:
+                self.spawnarBoss()
+
             # colisão robô x robô
             colisoes = pygame.sprite.groupcollide(self.inimigos, self.inimigos, False, False)
             for inimigo, lista_colididos in colisoes.items():
@@ -152,6 +139,39 @@ class Game():
             power = PowerUp(px, py, tipo)
             self.todos_sprites.add(power)
             self.powerups.add(power)
+
+    def spawnarRobo(self, altura_base, coordY=None):
+        # PESOS:
+        # RoboZigueZague: 4
+        # RoboLento: 2
+        # RoboRapido: 2
+        # RoboCiclico: 1
+        # RoboCacador: 1
+        # RoboSaltador: 1
+        print(coordY)
+
+        num = random.randint(1, 11)
+        if num <= 4:
+            robo = RoboZigueZague(random.randint(40, LARGURA - 60), altura_base)
+        elif num <= 6:
+            robo = RoboLento(random.randint(40, LARGURA - 40), altura_base)
+        elif num <= 8:
+            robo = RoboRapido(random.randint(40, LARGURA - 40), altura_base)
+        elif num == 9:
+            robo = RoboCiclico(random.randint(90, LARGURA - 90), altura_base)
+        elif num == 10:
+            robo = RoboCacador(random.randint(40, LARGURA - 40), altura_base, self.jogador)
+        elif num == 11:
+            robo = RoboSaltador(random.randint(40, LARGURA - 40), altura_base)
+        self.todos_sprites.add(robo) 
+        self.inimigos.add(robo)
+        self.spawn_timer = 0
+
+    def spawnarBoss(self):
+        if self.bossFinal is None or self.bossFinal.vivo == False:
+            self.bossFinal = BossFinal(LARGURA // 2, 125, 3, 240)
+            self.todos_sprites.add(self.bossFinal)
+            self.inimigos.add(self.bossFinal)
 
 
 jogo = Game(LARGURA, ALTURA, FPS)

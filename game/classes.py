@@ -310,11 +310,10 @@ class RoboCacador(Robo):
         self.vida = 3
         
     def atualizar_posicao(self):
+        self.rect.y += self.velocidade
         if self.rect.x > self.jogador.rect.x:
-            self.rect.y += self.velocidade
             self.rect.x -= self.direcao * 3
         else: 
-            self.rect.y += self.velocidade
             self.rect.x += self.direcao * 3
             
     def update(self):
@@ -380,14 +379,27 @@ class RoboSaltador(Robo):
             self.kill()
 
 class BossFinal(Robo):
-    def __init__(self, x, y, velocidade):
+    def __init__(self, x, y, velocidade, tamanho):
         super().__init__(x, y, velocidade)
+        self.tamanho = tamanho
         self.image = pygame.image.load('game/sprites/naveBoss.png').convert_alpha()
-        self.image = pygame.transform.scale(self.image, (LARGURA, LARGURA))
+        self.image = pygame.transform.scale(self.image, (self.tamanho, self.tamanho))
         self.rect = self.image.get_rect(center=(x, y))
         self.ticks = 0
         self.vida = 50
-        self.vivo = False
+        self.vivo = True
+        self.direcao = 1
+
+    def update(self):
+        self.rect.x += self.direcao * self.velocidade
+        if (self.rect.x + 240) >= LARGURA or self.rect.x  <= 0:
+            self.direcao *= -1
+
+    def tomarDano(self):
+        self.vida -= 1
+        print(self.vida)
+        if self.vida <= 0:
+            self.kill()
 
 class PowerUp(Entidade):
     def __init__(self, x, y, tipo):
