@@ -17,7 +17,7 @@ exit_button = pygame.transform.scale(exit_button, (190, 80))
 play_button_hover = pygame.transform.scale(play_button_hover, (190, 80))
 exit_button_hover = pygame.transform.scale(exit_button_hover, (190, 80))
 
-pygame.display.set_caption("Robot Defense - Template")
+pygame.display.set_caption("Spaceship Breakthrough")
 
 class Button:
     def __init__(self, rect, default_image, highlight_image, callback):

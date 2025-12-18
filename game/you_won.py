@@ -18,7 +18,7 @@ exit_button = pygame.transform.scale(exit_button, (190, 80))
 menu_button_hover = pygame.transform.scale(menu_button_hover, (190, 80))
 exit_button_hover = pygame.transform.scale(exit_button_hover, (190, 80))
 
-pygame.display.set_caption("Robot Defense - Template")
+pygame.display.set_caption("Spaceship Breakthrough")
 
 class Button:
     def __init__(self, rect, default_image, highlight_image, callback):
@@ -80,7 +80,7 @@ class YouWon:
     def run(self):
         clock = pygame.time.Clock()
         self.tela.blit(self.fundo_menu, (0,0))
-        pygame.mixer.music.load("game/sons/title screen.mp3")
+        pygame.mixer.music.load("game/sons/vitoria.mp3")
 
         pygame.mixer.music.set_volume(0.6)
         pygame.mixer.music.play(-1)
@@ -99,5 +99,3 @@ class YouWon:
 
             pygame.display.flip()
             clock.tick(FPS)
-
-YouWon().run()

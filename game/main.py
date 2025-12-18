@@ -3,6 +3,7 @@ import pygame
 import random
 from menu import Menu
 from gameover import GameOver
+from you_won import YouWon
 
 pygame.init()
 
@@ -25,9 +26,14 @@ class Game():
         self.spawn_timer = 0
         self.easter_egg = EasterEgg() 
         self.bossFinal = None
+        self.explosoes_ativas = []
+        self.sprites_explosao = []
+        for i in range(1, 16): 
+            img = pygame.image.load(f"game/sprites/Explosão/Explosão.{i}.png")
+            self.sprites_explosao.append(pygame.transform.scale(img, (250, 250)))
     
     def rodar(self):
-        TELA = pygame.display.set_mode((LARGURA, ALTURA))
+        self.tela = pygame.display.set_mode((LARGURA, ALTURA))
         self.fundo = pygame.image.load("game/sprites/background.png")
         self.jogador = Jogador(LARGURA // 2, ALTURA - 60)
         self.todos_sprites.add(self.jogador)
@@ -35,7 +41,7 @@ class Game():
         pygame.mixer.music.set_volume(0.4)
         pygame.mixer.music.play(-1)
     
-        pygame.display.set_caption("Robot Defense - Template")
+        pygame.display.set_caption("Spaceship Breakthrough")
         rodando = True
         while rodando:
             self.clock.tick(self.FPS)
@@ -68,12 +74,16 @@ class Game():
             som_explosao.set_volume(0.5)
             colisao = pygame.sprite.groupcollide(self.inimigos, self.tiros, False, True)
             for inimigo, tiro in colisao.items():
+                tiro_som = pygame.mixer.Sound("game/sons/laser1.wav")
+                tiro_som.set_volume(0.3)
+                tiro_som.play()
                 if inimigo.tomarDano() == 'morto':
                     # Ao matar inimigos, chance de dropar powerup
+                    self.adicionar_explosao(inimigo.rect.center)
                     som_explosao.play()
                     self.spawnarPowerUp(inimigo)
                     self.pontos += 1
-            
+                        
             if self.pontos == 1:
                 self.spawnarBoss()
 
@@ -91,8 +101,7 @@ class Game():
                 if self.jogador.vida <= 0:
                     rodando = False
                     GameOver().run()
-                    
-
+                
             # colisão jogador x powerup
             coletados = pygame.sprite.spritecollide(self.jogador, self.powerups, True)
             som_upgrade = pygame.mixer.Sound("game/sons/upgrade.mp3")
@@ -101,7 +110,6 @@ class Game():
                 # durações em frames (por exemplo 5s para velocidade, 6s para triplo)
                 dur_speed = 5 * self.FPS
                 dur_triple = 6 * self.FPS
-                
                 som_upgrade.play()
 
                 if p.tipo == 'vida':
@@ -131,8 +139,8 @@ class Game():
                 self.easter_egg.ativo = False
 
             # desenhar
-            TELA.blit(self.fundo, (0,0))
-            self.todos_sprites.draw(TELA)
+            self.tela.blit(self.fundo, (0,0))
+            self.todos_sprites.draw(self.tela)
 
             #Painel de pontos e vida
             font = pygame.font.Font("game/Minecraftia-Regular.ttf", 20)
@@ -142,10 +150,12 @@ class Game():
             vida_image = pygame.transform.scale(vida_image, (30, 40))
             pontos_image = pygame.image.load("game/sprites/pontuacao.png")
             pontos_image = pygame.transform.scale(pontos_image, (30, 40))
-            TELA.blit(pontos_image, (10, 60))
-            TELA.blit(texto_vida, (50, 20))
-            TELA.blit(texto_pontos, (50, 70))
-            TELA.blit(vida_image, (10, 10))
+            self.tela.blit(pontos_image, (10, 60))
+            self.tela.blit(texto_vida, (50, 20))
+            self.tela.blit(texto_pontos, (50, 70))
+            self.tela.blit(vida_image, (10, 10))
+            
+            self.gerenciar_explosoes()
 
             pygame.display.flip()
 
@@ -192,7 +202,30 @@ class Game():
             self.todos_sprites.add(self.bossFinal)
             self.inimigos.add(self.bossFinal)
 
+    def adicionar_explosao(self, posicao):
+        nova_explosao = {
+            'pos': posicao,
+            'frame': 0,
+            'ultimo_update': pygame.time.get_ticks()
+        }
+        self.explosoes_ativas.append(nova_explosao)
 
+    def gerenciar_explosoes(self):
+        agora = pygame.time.get_ticks()
+        tempo_entre_frames = 30 
+
+        for expl in self.explosoes_ativas:
+            if agora - expl['ultimo_update'] > tempo_entre_frames:
+                expl['frame'] += 1
+                expl['ultimo_update'] = agora
+            
+            if expl['frame'] < len(self.sprites_explosao):
+                img_atual = self.sprites_explosao[expl['frame']]
+                rect = img_atual.get_rect(center=expl['pos'])
+                self.tela.blit(img_atual, rect)
+            else:
+                self.explosoes_ativas.remove(expl)
+            
 jogo = Game(LARGURA, ALTURA, FPS)
 
 if __name__ == '__main__':
