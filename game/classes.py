@@ -397,9 +397,9 @@ class BossFinal(Robo):
 
     def tomarDano(self):
         self.vida -= 1
-        print(self.vida)
         if self.vida <= 0:
             self.kill()
+            self.vivo = False
 
 class PowerUp(Entidade):
     def __init__(self, x, y, tipo):

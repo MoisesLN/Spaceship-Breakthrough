@@ -61,7 +61,7 @@ class Game():
             # timer de entrada dos inimigos
             self.spawn_timer += 1
 
-            if self.bossFinal:
+            if self.bossFinal and self.bossFinal.vivo:
                 if self.spawn_timer > 30:
                     self.spawnarRobo(300, self.bossFinal.rect.x)
 
@@ -177,7 +177,6 @@ class Game():
         # RoboCiclico: 1
         # RoboCacador: 1
         # RoboSaltador: 1
-        print(coordY)
 
         num = random.randint(1, 11)
         if num <= 4:
