@@ -94,8 +94,9 @@ class Game():
                     som_explosao.play()
                     self.spawnarPowerUp(inimigo)
                     self.pontos += 1
-                        
-            if self.pontos == 1:
+
+            # Spawnar boss aos 50 pontos
+            if self.pontos == 50:
                 self.spawnarBoss()
 
             # colisão robô x robô
