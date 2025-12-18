@@ -400,6 +400,7 @@ class BossFinal(Robo):
         if self.vida <= 0:
             self.kill()
             self.vivo = False
+            return 'boss morto'
 
 class PowerUp(Entidade):
     def __init__(self, x, y, tipo):

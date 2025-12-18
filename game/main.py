@@ -77,7 +77,18 @@ class Game():
                 tiro_som = pygame.mixer.Sound("game/sons/laser1.wav")
                 tiro_som.set_volume(0.3)
                 tiro_som.play()
-                if inimigo.tomarDano() == 'morto':
+                # Checar se atirou no boss ou em inimigo normal
+                if type(inimigo) == BossFinal:
+                    if inimigo.tomarDano() == 'boss morto':
+                        self.adicionar_explosao(inimigo.rect.center)
+                        som_explosao.play()
+                        self.pontos += 1
+                        # Ativar tela de vencedor!! uhuu
+                        winner_screen = YouWon()
+                        winner_screen.run()
+                        rodando = False
+
+                elif inimigo.tomarDano() == 'morto':
                     # Ao matar inimigos, chance de dropar powerup
                     self.adicionar_explosao(inimigo.rect.center)
                     som_explosao.play()
@@ -141,6 +152,12 @@ class Game():
             # desenhar
             self.tela.blit(self.fundo, (0,0))
             self.todos_sprites.draw(self.tela)
+
+            # vida do boss
+            if self.bossFinal:
+                vidaBoss = pygame.image.load(f'game/sprites/barraVidaBoss/barraVida{self.bossFinal.vida // 5}.png')
+                vidaBoss = pygame.transform.scale(vidaBoss, (88, 240))
+                self.tela.blit(vidaBoss, (LARGURA - 98, 20))
 
             #Painel de pontos e vida
             font = pygame.font.Font("game/Minecraftia-Regular.ttf", 20)

@@ -1,5 +1,6 @@
 import pygame
 import sys
+from menu import Menu
 
 
 pygame.init()
@@ -44,6 +45,7 @@ class YouWon:
         self.fundo_menu = pygame.image.load("game/sprites/you_won.png")
         self.fundo_menu = pygame.transform.scale(self.fundo_menu, (600, 720))
         self.rodar_menu = False
+        self.menuClass = Menu()
     
         mid_x = LARGURA // 2
         start_y = ALTURA // 2 
@@ -72,6 +74,8 @@ class YouWon:
         pygame.mixer.music.stop()
         self.running = False
         self.rodar_menu = True
+        self.menuClass.running = True
+        self.menuClass.run()
 
     def exit_game(self):
         pygame.quit()
